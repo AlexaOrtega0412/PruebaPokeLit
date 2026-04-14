@@ -10,15 +10,15 @@ export class PokemonApp extends LitElement {
       border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 1000px; 
+      max-width: 900px;
       color: #2d3436;
       font-family: 'Poppins', sans-serif;
       margin: auto;
     }
 
-    .grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; }
+    .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
 
-    
+    /* Buscador */
     .search-box { 
       display: flex; gap: 10px; margin-bottom: 15px;
       background: #fff; padding: 5px; border-radius: 12px;
@@ -32,26 +32,22 @@ export class PokemonApp extends LitElement {
     }
     .btn-search { background: #6c5ce7; color: white; }
     .btn-random { background: #fab1a0; color: #d63031; width: 100%; margin-bottom: 20px; }
-    .btn-add { background: #00b894; color: white; width: 100%; margin-top: 20px; }
-    .btn-delete { background: #ff7675; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; }
-
     
+    /* Botones de Acción */
+    .btn-info { background: #0984e3; color: white; font-size: 0.8rem; padding: 8px 15px; }
+    .btn-add { background: #00b894; color: white; width: 100%; margin-top: 15px; }
+    .btn-delete { background: #ff7675; color: white; padding: 5px 10px; font-size: 0.7rem; border-radius: 6px; }
+
+    button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
     .pkm-card { border-radius: 20px; padding: 25px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
     .pkm-img { width: 150px; height: 150px; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.2)); }
     
-    
-    .stats-container { display: flex; justify-content: space-around; margin-top: 15px; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 12px; }
-    .stat-item { display: flex; flex-direction: column; }
-    .stat-label { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
-    .stat-value { font-weight: 600; font-size: 1rem; }
-
-    
     .table-container { background: #fff; border-radius: 15px; padding: 15px; }
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 12px; color: #636e72; border-bottom: 2px solid #f1f2f6; font-size: 0.8rem; }
-    td { padding: 10px 12px; border-bottom: 1px solid #f1f2f6; font-size: 0.9rem; }
+    th { text-align: left; padding: 15px; color: #636e72; border-bottom: 2px solid #f1f2f6; }
+    td { padding: 12px; border-bottom: 1px solid #f1f2f6; }
     .cap { text-transform: capitalize; }
-    .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; color: white; }
 
     @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
   `;
@@ -81,13 +77,25 @@ export class PokemonApp extends LitElement {
   }
 
   addToTable() {
-    if (this.team.length >= 6) return alert("¡Equipo completo!");
+    if (this.team.length >= 6) return alert("¡Equipo lleno!");
     if (this.team.find(p => p.id === this.pokemon.id)) return alert("Ya está en tu equipo.");
     this.team = [...this.team, this.pokemon];
   }
 
   deleteFromTeam(id) {
     this.team = this.team.filter(p => p.id !== id);
+  }
+
+  // MEJORA: Función unificada para mostrar todos los detalles
+  showFullDetails(p) {
+    // Obtenemos los tipos y los unimos con una coma
+    const tipos = p.types.map(t => t.type.name).join(', ');
+    
+    alert(`📝 FICHA TÉCNICA: ${p.name.toUpperCase()}
+    ---------------------------------
+    🧬 Tipo(s): ${tipos}
+    📏 Altura: ${p.height / 10} m
+    ⚖️ Peso: ${p.weight / 10} kg`);
   }
 
   getTypeColor(type) {
@@ -104,7 +112,7 @@ export class PokemonApp extends LitElement {
     const mainColor = this.pokemon ? this.getTypeColor(this.pokemon.types[0].type.name) : '#fff';
 
     return html`
-      <h1 style="text-align: center; margin-bottom: 25px;">Pokedex Pro</h1>
+      <h1 style="text-align: center; color: #2d3436; margin-bottom: 30px;">PokéDashboard Pro</h1>
       
       <div class="grid">
         <div>
@@ -115,29 +123,22 @@ export class PokemonApp extends LitElement {
           </div>
           
           <button class="btn-random" @click=${() => this.fetchPokemon(Math.floor(Math.random() * 150) + 1)}>
-            ✨ Generar Aleatorio
+            ✨ Sorpresa Aleatoria
           </button>
 
           ${this.pokemon ? html`
-            <div class="pkm-card" style="background: linear-gradient(180deg, ${mainColor}33 0%, #ffffff 100%)">
+            <div class="pkm-card" style="background: linear-gradient(180deg, ${mainColor}44 0%, #ffffff 100%)">
               <img class="pkm-img" src="${this.pokemon.sprites.other['official-artwork'].front_default || this.pokemon.sprites.front_default}">
-              <h2 class="cap">${this.pokemon.name}</h2>
+              <h2 class="cap" style="margin: 10px 0;">${this.pokemon.name}</h2>
               
-              <div class="stats-container">
-                <div class="stat-item">
-                  <span class="stat-label">Altura</span>
-                  <span class="stat-value">${this.pokemon.height / 10} m</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Peso</span>
-                  <span class="stat-value">${this.pokemon.weight / 10} kg</span>
-                </div>
-              </div>
+              <button class="btn-info" @click=${() => this.showFullDetails(this.pokemon)}>
+                Ver Detalles Completos
+              </button>
 
-              <button class="btn-add" @click=${this.addToTable}>Añadir al Equipo</button>
+              <button class="btn-add" @click=${this.addToTable}>Agregar al Equipo</button>
             </div>
           ` : html`<div style="text-align:center; padding: 40px; color: #b2bec3; border: 2px dashed #dfe6e9; border-radius: 20px;">
-              Busca un Pokémon para ver sus detalles
+              Busca un Pokémon para empezar
             </div>`}
         </div>
 
@@ -147,30 +148,22 @@ export class PokemonApp extends LitElement {
             <thead>
               <tr>
                 <th>Pokémon</th>
-                <th>Datos</th>
-                <th>Tipos</th>
-                <th></th>
+                <th>Nombre</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               ${this.team.map(p => html`
                 <tr>
                   <td><img src="${p.sprites.front_default}" width="45"></td>
-                  <td>
-                    <div class="cap"><strong>${p.name}</strong></div>
-                    <div style="font-size: 0.75rem; color: #636e72;">
-                      ${p.height / 10}m | ${p.weight / 10}kg
+                  <td class="cap">
+                    <strong>${p.name}</strong>
+                    <div style="font-size: 0.65rem; color: #0984e3; cursor: pointer;" @click=${() => this.showFullDetails(p)}>
+                      [ Ver Info ]
                     </div>
                   </td>
                   <td>
-                    ${p.types.map(t => html`
-                      <span class="badge" style="background: ${this.getTypeColor(t.type.name)}; margin-right: 4px;">
-                        ${t.type.name}
-                      </span>
-                    `)}
-                  </td>
-                  <td>
-                    <button class="btn-delete" @click=${() => this.deleteFromTeam(p.id)}>X</button>
+                    <button class="btn-delete" @click=${() => this.deleteFromTeam(p.id)}>Eliminar</button>
                   </td>
                 </tr>
               `)}
